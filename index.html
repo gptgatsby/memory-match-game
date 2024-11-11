@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Match Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #memory-game {
+            max-width: 450px;
+            margin: 20px auto;
+        }
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 100px);
+            grid-gap: 10px;
+            justify-content: center;
+        }
+        .memory-card {
+            width: 100px;
+            height: 100px;
+            background-color: #333;
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            transform: scale(1);
+            transition: transform 0.5s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0; /* Hide content until flipped */
+            color: white;
+        }
+        .memory-card.flip {
+            background-color: #6f9eaf;
+            transform: rotateY(180deg);
+            font-size: 16px; /* Show content after flip */
+        }
+
+        /* Individual words for each card */
+        .memory-card[data-name="Robot"]:before { content: "Robot"; }
+        .memory-card[data-name="Mini"]:before { content: "Mini"; }
+        .memory-card[data-name="Society"]:before { content: "Society"; }
+        .memory-card[data-name="AI"]:before { content: "AI"; }
+        .memory-card[data-name="NFT"]:before { content: "NFT"; }
+        .memory-card[data-name="Art"]:before { content: "Art"; }
+        .memory-card[data-name="Code"]:before { content: "Code"; }
+        .memory-card[data-name="Crypto"]:before { content: "Crypto"; }
+
+        /* Ensure text is hidden until flip and centers after flip */
+        .memory-card.flip:before {
+            display: block;
+            font-size: 16px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotateY(180deg); /* Flip text back to normal */
+        }
+    </style>
+</head>
+<body>
+    <div id="memory-game">
+        <h2>Memory Match Game</h2>
+        <div class="memory-grid">
+            <div class="memory-card" data-name="Robot"></div>
+            <div class="memory-card" data-name="Mini"></div>
+            <div class="memory-card" data-name="Society"></div>
+            <div class="memory-card" data-name="AI"></div>
+            <div class="memory-card" data-name="Robot"></div>
+            <div class="memory-card" data-name="Mini"></div>
+            <div class="memory-card" data-name="Society"></div>
+            <div class="memory-card" data-name="AI"></div>
+            <div class="memory-card" data-name="NFT"></div>
+            <div class="memory-card" data-name="Art"></div>
+            <div class="memory-card" data-name="Code"></div>
+            <div class="memory-card" data-name="Crypto"></div>
+            <div class="memory-card" data-name="NFT"></div>
+            <div class="memory-card" data-name="Art"></div>
+            <div class="memory-card" data-name="Code"></div>
+            <div class="memory-card" data-name="Crypto"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const cards = document.querySelectorAll('.memory-card');
+            let hasFlippedCard = false;
+            let lockBoard = false;
+            let firstCard, secondCard;
+
+            function flipCard() {
+                if (lockBoard) return;
+                if (this === firstCard) return;
+
+                this.classList.add('flip');
+
+                if (!hasFlippedCard) {
+                    hasFlippedCard = true;
+                    firstCard = this;
+                    return;
+                }
+
+                secondCard = this;
+                checkForMatch();
+            }
+
+            function checkForMatch() {
+                let isMatch = firstCard.dataset.name === secondCard.dataset.name;
+                isMatch ? disableCards() : unflipCards();
+            }
+
+            function disableCards() {
+                firstCard.removeEventListener('click', flipCard);
+                secondCard.removeEventListener('click', flipCard);
+                resetBoard();
+            }
+
+            function unflipCards() {
+                lockBoard = true;
+                setTimeout(() => {
+                    firstCard.classList.remove('flip');
+                    secondCard.classList.remove('flip');
+                    resetBoard();
+                }, 1000);
+            }
+
+            function resetBoard() {
+                [hasFlippedCard, lockBoard] = [false, false];
+                [firstCard, secondCard] = [null, null];
+            }
+
+            (function shuffle() {
+                cards.forEach(card => {
+                    let randomPos = Math.floor(Math.random() * 16);
+                    card.style.order = randomPos;
+                });
+            })();
+
+            cards.forEach(card => card.addEventListener('click', flipCard));
+        });
+    </script>
+</body>
+</html>
